@@ -28,11 +28,11 @@ bin/dev-teardown               # deactivate — back to your global install
 forge/                          <- your working tree
 ├── .claude/skills/              <- created by dev-setup (gitignored)
 │   ├── forge -> ../../         <- symlink back to repo root
-│   ├── review -> forge/review
+│   ├── audit -> forge/audit
 │   ├── ship -> forge/ship
 │   └── ...                      <- one symlink per skill
-├── review/
-│   └── SKILL.md                 <- edit this, test with /review
+├── audit/
+│   └── SKILL.md                 <- edit this, test with /audit
 ├── ship/
 │   └── SKILL.md
 ├── browse/
@@ -51,7 +51,7 @@ bin/dev-setup
 vim audit/SKILL.md
 
 # 3. Test it in Claude Code — changes are live
-#    > /review
+#    > /audit
 
 # 4. Editing browse source? Rebuild the binary
 bun run build

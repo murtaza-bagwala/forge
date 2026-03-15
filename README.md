@@ -49,7 +49,7 @@ Claude: [Architecture diagram, state machine for upload → classify → enrich
 
 You:   [exit plan mode, implement the plan]
 
-You:   /review
+You:   /audit
 
 Claude: Race condition: two tabs can overwrite cover-photo selection.
         Trust boundary: pulling web data into draft generation creates
@@ -61,17 +61,13 @@ You:   /ship
 
 Claude: [Syncs main, runs tests, pushes branch, opens PR — 6 tool calls, done]
 
-You:   /test
+You:   /probe
 
 Claude: Analyzing branch diff... 8 files changed, 3 routes affected.
         [Tests /listings/new, /listings/:id, /api/listings against localhost:3000]
         All 3 routes working. Upload + enrichment flow passes end to end.
 
-You:   staging.myapp.com
-
-Claude: Imported 8 cookies for staging.myapp.com from Chrome.
-
-You:   /test https://staging.myapp.com --quick
+You:   /probe https://staging.myapp.com --quick
 
 Claude: [Smoke test: homepage + 5 pages, 30 seconds]
         Health Score: 91/100. No critical issues. 1 medium: mobile nav overlap.
@@ -101,21 +97,20 @@ This is the setup I use. One person, ten parallel agents, each with the right co
 
 Open Claude Code and paste this. Claude will do the rest.
 
-> Install forge: run `git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup` then add a "forge" section to CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /test. Then ask the user if they also want to add forge to the current project so teammates get it.
+> Install forge: run `git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup` then add a "forge" section to CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /probe. Then ask the user if they also want to add forge to the current project so teammates get it.
 
 ### Step 2: Add to your repo so teammates get it (optional)
 
-> Add forge to this project: run `cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup` then add a "forge" section to this project's CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /test, and tells Claude that if forge skills aren't working, run `cd .claude/skills/forge && ./setup` to build the binary and register skills.
+> Add forge to this project: run `cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup` then add a "forge" section to this project's CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /probe, and tells Claude that if forge skills aren't working, run `cd .claude/skills/forge && ./setup` to build the binary and register skills.
 
 Real files get committed to your repo (not a submodule), so `git clone` just works. The binary and node\_modules are gitignored — teammates just need to run `cd .claude/skills/forge && ./setup` once to build (or `/browse` handles it automatically on first use).
 
 ### What gets installed
 
 - Skill files (Markdown prompts) in `~/.claude/skills/forge/` (or `.claude/skills/forge/` for project installs)
-- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/test`, `~/.claude/skills/audit`, etc. pointing into the forge directory
+- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/probe`, `~/.claude/skills/audit`, etc. pointing into the forge directory
 - Browser binary at `browse/dist/browse` (~58MB, gitignored)
 - `node_modules/` (gitignored)
-- `/retro` saves JSON snapshots to `.context/retros/` in your project for trend tracking
 
 Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
 
@@ -348,7 +343,7 @@ forge solves this. `/audit` and `/ship` are now Greptile-aware. They read Grepti
 
 The result is a two-layer review: Greptile catches things asynchronously on the PR, then `/audit` and `/ship` triage those findings as part of the normal workflow. Nothing falls through the cracks.
 
-It also learns. Every false positive you confirm gets saved to `~/.forge/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase. And `/retro` tracks Greptile's batting average over time — so you can see whether the signal-to-noise ratio is improving.
+It also learns. Every false positive you confirm gets saved to `~/.forge/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase.
 
 ### Example
 
@@ -468,7 +463,7 @@ This is my **QA lead mode**.
 The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/probe` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan. It figures out what to test from the code you changed.
 
 ```
-You:   /test
+You:   /probe
 
 Claude: Analyzing branch diff against main...
         12 files changed: 3 controllers, 2 views, 4 services, 3 tests
@@ -494,7 +489,7 @@ Four modes:
 - **Regression** (`--regression baseline.json`) — run full mode, then diff against a previous baseline. Which issues are fixed? Which are new? What's the score delta?
 
 ```
-You:   /test https://staging.myapp.com
+You:   /probe https://staging.myapp.com
 
 Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
 
