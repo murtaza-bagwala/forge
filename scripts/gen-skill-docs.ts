@@ -102,13 +102,14 @@ _UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skil
 [ -n "$_UPD" ] && echo "$_UPD" || true
 \`\`\`
 
+If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`~/.claude/skills/forge/forge-upgrade/SKILL.md\` and follow the "Inline upgrade flow". If \`JUST_UPGRADED <from> <to>\`: tell user "Running forge v{to} (just updated!)" and continue.`;
 }
 
 function generateBrowseSetup(): string {
   return `## SETUP (run this check BEFORE any browse command)
 
 \`\`\`bash
-_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+_ROOT=\$(git rev-parse --show-toplevel 2>/dev/null)
 B=""
 [ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/forge/browse/dist/browse" ] && B="$_ROOT/.claude/skills/forge/browse/dist/browse"
 [ -z "$B" ] && B=~/.claude/skills/forge/browse/dist/browse
