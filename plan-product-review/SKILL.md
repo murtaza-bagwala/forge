@@ -1,5 +1,5 @@
 ---
-name: plan-ceo-review
+name: plan-product-review
 version: 1.0.0
 description: |
   CEO/founder-mode plan review. Rethink the problem, find the 10-star product,
@@ -13,8 +13,16 @@ allowed-tools:
   - Bash
   - AskUserQuestion
 ---
+<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
+<!-- Regenerate: bun run gen:skill-docs -->
 
-{{UPDATE_CHECK}}
+## Update Check (run first)
+
+```bash
+_UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skills/forge/bin/forge-update-check 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+```
+
 
 # Mega Plan Review Mode
 

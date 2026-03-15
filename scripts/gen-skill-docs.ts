@@ -102,7 +102,6 @@ _UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skil
 [ -n "$_UPD" ] && echo "$_UPD" || true
 \`\`\`
 
-If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`~/.claude/skills/forge/forge-upgrade/SKILL.md\` and follow the "Inline upgrade flow" (AskUserQuestion → upgrade if yes, \`touch ~/.forge/last-update-check\` if no). If \`JUST_UPGRADED <from> <to>\`: tell user "Running forge v{to} (just updated!)" and continue.`;
 }
 
 function generateBrowseSetup(): string {
@@ -176,13 +175,11 @@ function findTemplates(): string[] {
     path.join(ROOT, 'SKILL.md.tmpl'),
     path.join(ROOT, 'browse', 'SKILL.md.tmpl'),
     path.join(ROOT, 'qa', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'setup-browser-cookies', 'SKILL.md.tmpl'),
     path.join(ROOT, 'ship', 'SKILL.md.tmpl'),
     path.join(ROOT, 'review', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'plan-ceo-review', 'SKILL.md.tmpl'),
+    path.join(ROOT, 'plan-product-review', 'SKILL.md.tmpl'),
     path.join(ROOT, 'plan-eng-review', 'SKILL.md.tmpl'),
     path.join(ROOT, 'retro', 'SKILL.md.tmpl'),
-    path.join(ROOT, 'forge-upgrade', 'SKILL.md.tmpl'),
   ];
   for (const p of candidates) {
     if (fs.existsSync(p)) templates.push(p);

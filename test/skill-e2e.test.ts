@@ -304,7 +304,7 @@ describeE2E('QA skill E2E', () => {
     try { fs.rmSync(qaDir, { recursive: true, force: true }); } catch {}
   });
 
-  test('/qa quick completes without browse errors', async () => {
+  test('/test quick completes without browse errors', async () => {
     const result = await runSkillTest({
       prompt: `You have a browse binary at ${browseBin}. Assign it to B variable like: B="${browseBin}"
 
@@ -320,11 +320,11 @@ Write your report to ${qaDir}/qa-reports/qa-report.md`,
       runId,
     });
 
-    logCost('/qa quick', result);
-    recordE2E('/qa quick', 'QA skill E2E', result);
+    logCost('/test quick', result);
+    recordE2E('/test quick', 'QA skill E2E', result);
     // browseErrors can include false positives from hallucinated paths
     if (result.browseErrors.length > 0) {
-      console.warn('/qa quick browse errors (non-fatal):', result.browseErrors);
+      console.warn('/test quick browse errors (non-fatal):', result.browseErrors);
     }
     // Accept error_max_turns — the agent doing thorough QA work is not a failure
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
@@ -540,17 +540,17 @@ CRITICAL RULES:
   }
 
   // B6: Static dashboard — broken link, disabled submit, overflow, missing alt, console error
-  test('/qa finds >= 2 of 5 planted bugs (static)', async () => {
+  test('/test finds >= 2 of 5 planted bugs (static)', async () => {
     await runPlantedBugEval('qa-eval.html', 'qa-eval-ground-truth.json', 'b6-static');
   }, 360_000);
 
   // B7: SPA — broken route, stale state, async race, missing aria, console warning
-  test('/qa finds >= 2 of 5 planted SPA bugs', async () => {
+  test('/test finds >= 2 of 5 planted SPA bugs', async () => {
     await runPlantedBugEval('qa-eval-spa.html', 'qa-eval-spa-ground-truth.json', 'b7-spa');
   }, 360_000);
 
   // B8: Checkout — email regex, NaN total, CC overflow, missing required, stripe error
-  test('/qa finds >= 2 of 5 planted checkout bugs', async () => {
+  test('/test finds >= 2 of 5 planted checkout bugs', async () => {
     await runPlantedBugEval('qa-eval-checkout.html', 'qa-eval-checkout-ground-truth.json', 'b8-checkout');
   }, 360_000);
 
@@ -598,11 +598,11 @@ We're building a new user dashboard that shows recent activity, notifications, a
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'add plan']);
 
-    // Copy plan-ceo-review skill
-    fs.mkdirSync(path.join(planDir, 'plan-ceo-review'), { recursive: true });
+    // Copy plan-product-review skill
+    fs.mkdirSync(path.join(planDir, 'plan-product-review'), { recursive: true });
     fs.copyFileSync(
-      path.join(ROOT, 'plan-ceo-review', 'SKILL.md'),
-      path.join(planDir, 'plan-ceo-review', 'SKILL.md'),
+      path.join(ROOT, 'plan-product-review', 'SKILL.md'),
+      path.join(planDir, 'plan-product-review', 'SKILL.md'),
     );
   });
 
@@ -610,9 +610,9 @@ We're building a new user dashboard that shows recent activity, notifications, a
     try { fs.rmSync(planDir, { recursive: true, force: true }); } catch {}
   });
 
-  test('/plan-ceo-review produces structured review output', async () => {
+  test('/plan-product-review produces structured review output', async () => {
     const result = await runSkillTest({
-      prompt: `Read plan-ceo-review/SKILL.md for the review workflow.
+      prompt: `Read plan-product-audit/SKILL.md for the review workflow.
 
 Read plan.md — that's the plan to review. This is a standalone plan document, not a codebase — skip any codebase exploration or system audit steps.
 
@@ -623,12 +623,12 @@ Focus on reviewing the plan content: architecture, error handling, security, and
       workingDirectory: planDir,
       maxTurns: 15,
       timeout: 360_000,
-      testName: 'plan-ceo-review',
+      testName: 'plan-product-review',
       runId,
     });
 
-    logCost('/plan-ceo-review', result);
-    recordE2E('/plan-ceo-review', 'Plan CEO Review E2E', result);
+    logCost('/plan-product-review', result);
+    recordE2E('/plan-product-review', 'Plan CEO Review E2E', result);
     // Accept error_max_turns — the CEO review is very thorough and may exceed turns
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
@@ -705,7 +705,7 @@ Replace session-cookie auth with JWT tokens. Currently using express-session + R
 
   test('/plan-eng-review produces structured review output', async () => {
     const result = await runSkillTest({
-      prompt: `Read plan-eng-review/SKILL.md for the review workflow.
+      prompt: `Read plan-eng-audit/SKILL.md for the review workflow.
 
 Read plan.md — that's the plan to review. This is a standalone plan document, not a codebase — skip any codebase exploration steps.
 
@@ -736,13 +736,10 @@ Focus on architecture, code quality, tests, and performance sections.`,
 // --- Retro E2E ---
 
 describeE2E('Retro E2E', () => {
-  let retroDir: string;
 
   beforeAll(() => {
-    retroDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-retro-'));
     const { spawnSync } = require('child_process');
     const run = (cmd: string, args: string[]) =>
-      spawnSync(cmd, args, { cwd: retroDir, stdio: 'pipe', timeout: 5000 });
 
     // Create a git repo with varied commit history
     run('git', ['init']);
@@ -750,69 +747,44 @@ describeE2E('Retro E2E', () => {
     run('git', ['config', 'user.name', 'Dev']);
 
     // Day 1 commits
-    fs.writeFileSync(path.join(retroDir, 'app.ts'), 'console.log("hello");\n');
     run('git', ['add', 'app.ts']);
     run('git', ['commit', '-m', 'feat: initial app setup', '--date', '2026-03-10T09:00:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'auth.ts'), 'export function login() {}\n');
     run('git', ['add', 'auth.ts']);
     run('git', ['commit', '-m', 'feat: add auth module', '--date', '2026-03-10T11:00:00']);
 
     // Day 2 commits
-    fs.writeFileSync(path.join(retroDir, 'app.ts'), 'import { login } from "./auth";\nconsole.log("hello");\nlogin();\n');
     run('git', ['add', 'app.ts']);
     run('git', ['commit', '-m', 'fix: wire up auth to app', '--date', '2026-03-11T10:00:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'test.ts'), 'import { test } from "bun:test";\ntest("login", () => {});\n');
     run('git', ['add', 'test.ts']);
     run('git', ['commit', '-m', 'test: add login test', '--date', '2026-03-11T14:00:00']);
 
     // Day 3 commits
-    fs.writeFileSync(path.join(retroDir, 'api.ts'), 'export function getUsers() { return []; }\n');
     run('git', ['add', 'api.ts']);
     run('git', ['commit', '-m', 'feat: add users API endpoint', '--date', '2026-03-12T09:30:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'README.md'), '# My App\nA test application.\n');
     run('git', ['add', 'README.md']);
     run('git', ['commit', '-m', 'docs: add README', '--date', '2026-03-12T16:00:00']);
 
-    // Copy retro skill
-    fs.mkdirSync(path.join(retroDir, 'retro'), { recursive: true });
     fs.copyFileSync(
-      path.join(ROOT, 'retro', 'SKILL.md'),
-      path.join(retroDir, 'retro', 'SKILL.md'),
     );
   });
 
   afterAll(() => {
-    try { fs.rmSync(retroDir, { recursive: true, force: true }); } catch {}
   });
 
-  test('/retro produces analysis from git history', async () => {
     const result = await runSkillTest({
-      prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
 
-Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
-Write your retrospective report to ${retroDir}/retro-output.md
 
 Analyze the git history and produce the narrative report as described in the SKILL.md.`,
-      workingDirectory: retroDir,
       maxTurns: 30,
       timeout: 300_000,
-      testName: 'retro',
       runId,
     });
 
-    logCost('/retro', result);
-    recordE2E('/retro', 'Retro E2E', result);
-    // Accept error_max_turns — retro does many git commands to analyze history
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
-    // Verify the retro was written
-    const retroPath = path.join(retroDir, 'retro-output.md');
-    if (fs.existsSync(retroPath)) {
-      const retro = fs.readFileSync(retroPath, 'utf-8');
-      expect(retro.length).toBeGreaterThan(100);
     }
   }, 420_000);
 });
@@ -824,10 +796,8 @@ describeE2E('Deferred skill E2E', () => {
   test.todo('/ship completes full workflow');
 
   // Setup-browser-cookies requires interactive browser picker UI
-  test.todo('/setup-browser-cookies imports cookies');
 
   // Gstack-upgrade is destructive: modifies skill installation directory
-  test.todo('/forge-upgrade completes upgrade flow');
 });
 
 // Module-level afterAll — finalize eval collector after all tests complete

@@ -1,5 +1,5 @@
 ---
-name: plan-ceo-review
+name: plan-product-review
 version: 1.0.0
 description: |
   CEO/founder-mode plan review. Rethink the problem, find the 10-star product,
@@ -13,17 +13,8 @@ allowed-tools:
   - Bash
   - AskUserQuestion
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
 
-## Update Check (run first)
-
-```bash
-_UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skills/forge/bin/forge-update-check 2>/dev/null || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
-```
-
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/forge/forge-upgrade/SKILL.md` and follow the "Inline upgrade flow" (AskUserQuestion → upgrade if yes, `touch ~/.forge/last-update-check` if no). If `JUST_UPGRADED <from> <to>`: tell user "Running forge v{to} (just updated!)" and continue.
+{{UPDATE_CHECK}}
 
 # Mega Plan Review Mode
 

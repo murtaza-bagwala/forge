@@ -23,7 +23,7 @@
   - [x] 148 integration tests (was ~63)
 
 ## Phase 3: QA Testing Agent (v0.3.0)
-  - [x] `/qa` SKILL.md — 6-phase workflow: Initialize → Authenticate → Orient → Explore → Document → Wrap up
+  - [x] `/probe` SKILL.md — 6-phase workflow: Initialize → Authenticate → Orient → Explore → Document → Wrap up
   - [x] Issue taxonomy reference (7 categories: visual, functional, UX, content, performance, console, accessibility)
   - [x] Severity classification (critical/high/medium/low)
   - [x] Exploration checklist per page
@@ -51,7 +51,7 @@
   - [ ] `/setup-forge-upload` skill (configure S3 bucket for image hosting)
   - [ ] `browse/bin/forge-upload` helper (upload file to S3, return public URL)
   - [ ] `/ship` Step 7.5: visual verification with screenshots in PR body
-  - [ ] `/review` Step 4.5: visual review with annotated screenshots in PR
+  - [ ] `/audit` Step 4.5: visual review with annotated screenshots in PR
   - [ ] WebM → GIF conversion (ffmpeg) for video evidence in PRs
   - [ ] README documentation for visual PR annotations
 
@@ -102,7 +102,7 @@
 ## Future Ideas
   - [ ] Linux/Windows cookie decryption (GNOME Keyring / kwallet / DPAPI)
   - [ ] Trend tracking across QA runs — compare baseline.json over time, detect regressions (P2, S)
-  - [ ] CI/CD integration — `/qa` as GitHub Action step, fail PR if health score drops (P2, M)
+  - [ ] CI/CD integration — `/probe` as GitHub Action step, fail PR if health score drops (P2, M)
   - [ ] Accessibility audit mode — `--a11y` flag for focused accessibility testing (P3, S)
   - [ ] Greptile training feedback loop — export suppression patterns to Greptile team for model improvement (P3, S)
   - [x] E2E test cost tracking — track cumulative API spend, warn if over threshold (P3, S)

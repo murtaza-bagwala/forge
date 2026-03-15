@@ -14,7 +14,7 @@ bun install                    # install dependencies
 bin/dev-setup                  # activate dev mode
 ```
 
-Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live. When you're done developing:
+Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/audit`), and see your changes live. When you're done developing:
 
 ```bash
 bin/dev-teardown               # deactivate — back to your global install
@@ -48,7 +48,7 @@ forge/                          <- your working tree
 bin/dev-setup
 
 # 2. Edit a skill
-vim review/SKILL.md
+vim audit/SKILL.md
 
 # 3. Test it in Claude Code — changes are live
 #    > /review
@@ -249,7 +249,7 @@ the vendored copy too. This is a three-step process:
    cd /path/to/other-project
 
    # Remove old skill symlinks and vendored copy
-   for s in browse plan-ceo-review plan-eng-review review ship retro qa setup-browser-cookies; do
+   for s in browse plan-product-review plan-eng-review audit ship test; do
      rm -f .claude/skills/$s
    done
    rm -rf .claude/skills/forge

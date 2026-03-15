@@ -326,7 +326,7 @@ describeEval('Cross-skill consistency evals', () => {
     };
 
     const collected = [
-      extractGrepLines(reviewContent, 'review/SKILL.md'),
+      extractGrepLines(reviewContent, 'audit/SKILL.md'),
       extractGrepLines(shipContent, 'ship/SKILL.md'),
       extractGrepLines(triageContent, 'review/greptile-triage.md'),
       extractGrepLines(retroContent, 'retro/SKILL.md'),

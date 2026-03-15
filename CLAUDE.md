@@ -44,7 +44,7 @@ forge/
 │   └── skill-e2e.test.ts         # Tier 2: E2E via claude -p (~$3.85/run)
 ├── ship/            # Ship workflow skill
 ├── review/          # PR review skill
-├── plan-ceo-review/ # /plan-ceo-review skill
+├── plan-product-review/ # /plan-product-review skill
 ├── plan-eng-review/ # /plan-eng-review skill
 ├── retro/           # Retrospective skill
 ├── setup            # One-time setup: build binary + symlink skills

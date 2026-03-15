@@ -22,7 +22,6 @@ _UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skil
 [ -n "$_UPD" ] && echo "$_UPD" || true
 ```
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/forge/forge-upgrade/SKILL.md` and follow the "Inline upgrade flow" (AskUserQuestion → upgrade if yes, `touch ~/.forge/last-update-check` if no). If `JUST_UPGRADED <from> <to>`: tell user "Running forge v{to} (just updated!)" and continue.
 
 # Plan Review Mode
 

@@ -63,11 +63,8 @@ describe('gen-skill-docs', () => {
     { dir: 'qa', name: 'qa' },
     { dir: 'review', name: 'review' },
     { dir: 'ship', name: 'ship' },
-    { dir: 'plan-ceo-review', name: 'plan-ceo-review' },
+    { dir: 'plan-product-review', name: 'plan-product-review' },
     { dir: 'plan-eng-review', name: 'plan-eng-review' },
-    { dir: 'retro', name: 'retro' },
-    { dir: 'setup-browser-cookies', name: 'setup-browser-cookies' },
-    { dir: 'forge-upgrade', name: 'forge-upgrade' },
   ];
 
   test('every skill has a SKILL.md.tmpl template', () => {

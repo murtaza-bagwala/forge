@@ -92,6 +92,6 @@ fi
 # 4. First-time welcome + legacy cleanup
 if [ ! -d "$HOME/.forge" ]; then
   mkdir -p "$HOME/.forge"
-  echo "  Welcome! Run /forge-upgrade anytime to stay current."
+  echo "  Welcome! Run anytime to stay current."
 fi
 rm -f /tmp/forge-latest-version

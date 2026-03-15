@@ -17,18 +17,16 @@ Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/e
 
 | Skill | Mode | What it does |
 |-------|------|--------------|
-| `/plan-ceo-review` | Founder / CEO | Rethink the problem. Find the 10-star product hiding inside the request. |
+| `/plan-product-review` | Founder / CEO | Rethink the problem. Find the 10-star product hiding inside the request. |
 | `/plan-eng-review` | Eng manager / tech lead | Lock in architecture, data flow, diagrams, edge cases, and tests. |
-| `/review` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. Triages Greptile review comments. |
+| `/audit` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. Triages Greptile review comments. |
 | `/ship` | Release engineer | Sync main, run tests, resolve Greptile reviews, push, open PR. For a ready branch, not for deciding what to build. |
 | `/browse` | QA engineer | Give the agent eyes. It logs in, clicks through your app, takes screenshots, catches breakage. Full QA pass in 60 seconds. |
-| `/qa` | QA lead | Systematic QA testing. On a feature branch, auto-analyzes your diff, identifies affected pages, and tests them. Also: full exploration, quick smoke test, regression mode. |
-| `/setup-browser-cookies` | Session manager | Import cookies from your real browser (Comet, Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages without logging in manually. |
-| `/retro` | Engineering manager | Team-aware retro: your deep-dive + per-person praise and growth opportunities for every contributor. |
+| `/probe` | QA lead | Systematic QA testing. On a feature branch, auto-analyzes your diff, identifies affected pages, and tests them. Also: full exploration, quick smoke test, regression mode. |
 
 ## Demo: one feature, five modes
 
-I start almost every feature in plan mode. I describe what I want to build, then use `/plan-ceo-review` to pressure-test whether I am even building the right thing. Only after the product direction is locked do I shift into engineering, review, ship, and test.
+I start almost every feature in plan mode. I describe what I want to build, then use `/plan-product-review` to pressure-test whether I am even building the right thing. Only after the product direction is locked do I shift into engineering, review, ship, and test.
 
 ```
 You:   [enter plan mode, describe the feature]
@@ -36,7 +34,7 @@ You:   [enter plan mode, describe the feature]
        should be able to upload a photo of their item and we create
        the listing from it.
 
-You:   /plan-ceo-review
+You:   /plan-product-review
 
 Claude: "Photo upload" is not the feature. The real job is helping sellers
         create listings that actually sell. Here's what the 10-star version
@@ -63,17 +61,17 @@ You:   /ship
 
 Claude: [Syncs main, runs tests, pushes branch, opens PR — 6 tool calls, done]
 
-You:   /qa
+You:   /test
 
 Claude: Analyzing branch diff... 8 files changed, 3 routes affected.
         [Tests /listings/new, /listings/:id, /api/listings against localhost:3000]
         All 3 routes working. Upload + enrichment flow passes end to end.
 
-You:   /setup-browser-cookies staging.myapp.com
+You:   staging.myapp.com
 
 Claude: Imported 8 cookies for staging.myapp.com from Chrome.
 
-You:   /qa https://staging.myapp.com --quick
+You:   /test https://staging.myapp.com --quick
 
 Claude: [Smoke test: homepage + 5 pages, 30 seconds]
         Health Score: 91/100. No critical issues. 1 medium: mobile nav overlap.
@@ -89,9 +87,9 @@ This is not a prompt pack for beginners. It is an operating system for people wh
 
 forge is powerful with one Claude Code session. It is transformative with ten.
 
-[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. That means you can have one session running `/qa` on staging, another doing `/review` on a PR, a third implementing a feature, and seven more working on other branches. All at the same time.
+[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. That means you can have one session running `/probe` on staging, another doing `/audit` on a PR, a third implementing a feature, and seven more working on other branches. All at the same time.
 
-Each workspace gets its own isolated browser instance automatically — separate Chromium process, cookies, tabs, and logs stored in `.forge/` inside each project root. No port collisions, no shared state, no configuration needed. `/browse` and `/qa` sessions never interfere with each other, even across ten parallel workspaces.
+Each workspace gets its own isolated browser instance automatically — separate Chromium process, cookies, tabs, and logs stored in `.forge/` inside each project root. No port collisions, no shared state, no configuration needed. `/browse` and `/probe` sessions never interfere with each other, even across ten parallel workspaces.
 
 This is the setup I use. One person, ten parallel agents, each with the right cognitive mode for its task. That is not incremental improvement. That is a different way of building software.
 
@@ -103,18 +101,18 @@ This is the setup I use. One person, ten parallel agents, each with the right co
 
 Open Claude Code and paste this. Claude will do the rest.
 
-> Install forge: run `git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup` then add a "forge" section to CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-ceo-review, /plan-eng-review, /review, /ship, /browse, /qa, /setup-browser-cookies, /retro. Then ask the user if they also want to add forge to the current project so teammates get it.
+> Install forge: run `git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup` then add a "forge" section to CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /test. Then ask the user if they also want to add forge to the current project so teammates get it.
 
 ### Step 2: Add to your repo so teammates get it (optional)
 
-> Add forge to this project: run `cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup` then add a "forge" section to this project's CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-ceo-review, /plan-eng-review, /review, /ship, /browse, /qa, /setup-browser-cookies, /retro, and tells Claude that if forge skills aren't working, run `cd .claude/skills/forge && ./setup` to build the binary and register skills.
+> Add forge to this project: run `cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup` then add a "forge" section to this project's CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /test, and tells Claude that if forge skills aren't working, run `cd .claude/skills/forge && ./setup` to build the binary and register skills.
 
 Real files get committed to your repo (not a submodule), so `git clone` just works. The binary and node\_modules are gitignored — teammates just need to run `cd .claude/skills/forge && ./setup` once to build (or `/browse` handles it automatically on first use).
 
 ### What gets installed
 
 - Skill files (Markdown prompts) in `~/.claude/skills/forge/` (or `.claude/skills/forge/` for project installs)
-- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/qa`, `~/.claude/skills/review`, etc. pointing into the forge directory
+- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/test`, `~/.claude/skills/audit`, etc. pointing into the forge directory
 - Browser binary at `browse/dist/browse` (~58MB, gitignored)
 - `node_modules/` (gitignored)
 - `/retro` saves JSON snapshots to `.context/retros/` in your project for trend tracking
@@ -150,7 +148,7 @@ These skills let me tell the model what kind of brain I want right now. I can sw
 
 ---
 
-## `/plan-ceo-review`
+## `/plan-product-review`
 
 This is my **founder mode**.
 
@@ -172,7 +170,7 @@ A weak assistant will add a file picker and save an image.
 
 That is not the real product.
 
-In `/plan-ceo-review`, I want the model to ask whether "photo upload" is even the feature. Maybe the real feature is helping someone create a listing that actually sells.
+In `/plan-product-review`, I want the model to ask whether "photo upload" is even the feature. Maybe the real feature is helping someone create a listing that actually sells.
 
 If that is the real job, the whole plan changes.
 
@@ -186,7 +184,7 @@ Now the model should ask:
 * Can we detect when the uploaded photo is ugly, dark, cluttered, or low-trust?
 * Can we make the experience feel premium instead of like a dead form from 2007?
 
-That is what `/plan-ceo-review` does for me.
+That is what `/plan-product-review` does for me.
 
 It does not just ask, "how do I add this feature?"
 It asks, **"what is the 10-star product hiding inside this request?"**
@@ -222,7 +220,7 @@ So `/plan-eng-review` is where I want the model to build the technical spine tha
 
 Take the same listing app example.
 
-Let's say `/plan-ceo-review` already did its job. We decided the real feature is not just photo upload. It is a smart listing flow that:
+Let's say `/plan-product-review` already did its job. We decided the real feature is not just photo upload. It is a smart listing flow that:
 
 * uploads photos
 * identifies the product
@@ -252,13 +250,13 @@ Not "make the idea smaller."
 
 ---
 
-## `/review`
+## `/audit`
 
 This is my **paranoid staff engineer mode**.
 
 Passing tests do not mean the branch is safe.
 
-`/review` exists because there is a whole class of bugs that can survive CI and still punch you in the face in production. This mode is not about dreaming bigger. It is not about making the plan prettier. It is about asking:
+`/audit` exists because there is a whole class of bugs that can survive CI and still punch you in the face in production. This mode is not about dreaming bigger. It is not about making the plan prettier. It is about asking:
 
 **What can still break?**
 
@@ -278,7 +276,7 @@ This is a structural audit, not a style nitpick pass. I want the model to look f
 
 Suppose the smart listing flow is implemented and the tests are green.
 
-`/review` should still ask:
+`/audit` should still ask:
 
 * Did I introduce an N+1 query when rendering listing photos or draft suggestions?
 * Am I trusting client-provided file metadata instead of validating the actual file?
@@ -288,7 +286,7 @@ Suppose the smart listing flow is implemented and the tests are green.
 * If enrichment APIs partially fail, do I degrade gracefully or save garbage?
 * Did I accidentally create a prompt injection or trust-boundary problem by pulling web data into draft generation?
 
-That is the point of `/review`.
+That is the point of `/audit`.
 
 I do not want flattery here.
 I want the model imagining the production incident before it happens.
@@ -342,13 +340,13 @@ I want the plane landed.
 
 The problem with any automated reviewer is triage. Greptile is good, but not every comment is a real issue. Some are false positives. Some flag things you already fixed three commits ago. Without a triage layer, the comments pile up and you start ignoring them — which defeats the purpose.
 
-forge solves this. `/review` and `/ship` are now Greptile-aware. They read Greptile's comments, classify each one, and take action:
+forge solves this. `/audit` and `/ship` are now Greptile-aware. They read Greptile's comments, classify each one, and take action:
 
 - **Valid issues** get added to the critical findings and fixed before shipping
 - **Already-fixed issues** get an auto-reply acknowledging the catch
 - **False positives** get pushed back — you confirm, and a reply goes out explaining why it's wrong
 
-The result is a two-layer review: Greptile catches things asynchronously on the PR, then `/review` and `/ship` triage those findings as part of the normal workflow. Nothing falls through the cracks.
+The result is a two-layer review: Greptile catches things asynchronously on the PR, then `/audit` and `/ship` triage those findings as part of the normal workflow. Nothing falls through the cracks.
 
 It also learns. Every false positive you confirm gets saved to `~/.forge/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase. And `/retro` tracks Greptile's batting average over time — so you can see whether the signal-to-noise ratio is improving.
 
@@ -461,16 +459,16 @@ For the full command reference, technical internals, and architecture details, s
 
 ---
 
-## `/qa`
+## `/probe`
 
 This is my **QA lead mode**.
 
-`/browse` gives the agent eyes. `/qa` gives it a testing methodology.
+`/browse` gives the agent eyes. `/probe` gives it a testing methodology.
 
-The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/qa` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan. It figures out what to test from the code you changed.
+The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/probe` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan. It figures out what to test from the code you changed.
 
 ```
-You:   /qa
+You:   /test
 
 Claude: Analyzing branch diff against main...
         12 files changed: 3 controllers, 2 views, 4 services, 3 tests
@@ -496,7 +494,7 @@ Four modes:
 - **Regression** (`--regression baseline.json`) — run full mode, then diff against a previous baseline. Which issues are fixed? Which are new? What's the score delta?
 
 ```
-You:   /qa https://staging.myapp.com
+You:   /test https://staging.myapp.com
 
 Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
 
@@ -512,77 +510,6 @@ Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
 
 Reports and screenshots accumulate in `.forge/qa-reports/` so you can track quality over time and compare runs.
 
-**Testing authenticated pages:** Use `/setup-browser-cookies` first to import your real browser sessions, then `/qa` can test pages behind login.
-
----
-
-## `/setup-browser-cookies`
-
-This is my **session manager mode**.
-
-Before `/qa` or `/browse` can test authenticated pages, they need cookies. Instead of manually logging in through the headless browser every time, `/setup-browser-cookies` imports your real sessions directly from your daily browser.
-
-It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session. An interactive picker UI lets you choose exactly which domains to import — no cookie values are ever displayed.
-
-```
-You:   /setup-browser-cookies
-
-Claude: Cookie picker opened — select the domains you want to import
-        in your browser, then tell me when you're done.
-
-        [You pick github.com, myapp.com in the browser UI]
-
-You:    done
-
-Claude: Imported 2 domains (47 cookies). Session is ready.
-```
-
-Or skip the UI entirely:
-
-```
-You:   /setup-browser-cookies github.com
-
-Claude: Imported 12 cookies for github.com from Comet.
-```
-
-First import per browser triggers a macOS Keychain prompt — click "Allow" or "Always Allow."
-
----
-
-## `/retro`
-
-This is my **engineering manager mode**.
-
-At the end of the week I want to know what actually happened. Not vibes — data. `/retro` analyzes commit history, work patterns, and shipping velocity and writes a candid retrospective.
-
-It is team-aware. It identifies who is running the command, gives you the deepest treatment on your own work, then breaks down every contributor with specific praise and growth opportunities — the kind of feedback you would actually give in a 1:1. It computes metrics like commits, LOC, test ratio, PR sizes, and fix ratio. It detects coding sessions from commit timestamps, finds hotspot files, tracks shipping streaks, and identifies the biggest ship of the week.
-
-```
-You:   /retro
-
-Claude: Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests, 12 PRs, peak: 10pm | Streak: 47d
-
-        ## Your Week
-        32 commits, +2.4k LOC, 41% tests. Peak hours: 9-11pm.
-        Biggest ship: cookie import system (browser decryption + picker UI).
-        What you did well: shipped a complete feature with encryption, UI, and
-        18 unit tests in one focused push...
-
-        ## Team Breakdown
-
-        ### Alice
-        12 commits focused on app/services/. Every PR under 200 LOC — disciplined.
-        Opportunity: test ratio at 12% — worth investing before payment gets more complex.
-
-        ### Bob
-        3 commits — fixed the N+1 query on dashboard. Small but high-impact.
-        Opportunity: only 1 active day this week — check if blocked on anything.
-
-        [Top 3 team wins, 3 things to improve, 3 habits for next week]
-```
-
-It saves a JSON snapshot to `.context/retros/` so the next run can show trends. Run `/retro compare` to see this week vs last week side by side.
-
 ---
 
 ## Troubleshooting
@@ -594,7 +521,7 @@ Run `cd ~/.claude/skills/forge && ./setup` (or `cd .claude/skills/forge && ./set
 Run `cd ~/.claude/skills/forge && bun install && bun run build`. This compiles the browser binary. Requires Bun v1.0+.
 
 **Project copy is stale?**
-Re-copy from global: `for s in browse plan-ceo-review plan-eng-review review ship retro qa setup-browser-cookies; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
+Re-copy from global: `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
 
 **`bun` not installed?**
 Install it: `curl -fsSL https://bun.sh/install | bash`
@@ -603,7 +530,7 @@ Install it: `curl -fsSL https://bun.sh/install | bash`
 
 Paste this into Claude Code:
 
-> Update forge: run `cd ~/.claude/skills/forge && git fetch origin && git reset --hard origin/main && ./setup` (repo: https://github.com/murtaza-bagwala/forge). If this project also has forge at .claude/skills/forge, update it too: run `for s in browse plan-ceo-review plan-eng-review review ship retro qa setup-browser-cookies; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
+> Update forge: run `cd ~/.claude/skills/forge && git fetch origin && git reset --hard origin/main && ./setup` (repo: https://github.com/murtaza-bagwala/forge). If this project also has forge at .claude/skills/forge, update it too: run `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
 
 The `setup` script rebuilds the browser binary and re-symlinks skills. It takes a few seconds.
 
@@ -611,7 +538,7 @@ The `setup` script rebuilds the browser binary and re-symlinks skills. It takes 
 
 Paste this into Claude Code:
 
-> Uninstall forge: remove the skill symlinks by running `for s in browse plan-ceo-review plan-eng-review review ship retro qa setup-browser-cookies; do rm -f ~/.claude/skills/$s; done` then run `rm -rf ~/.claude/skills/forge` and remove the forge section from CLAUDE.md. If this project also has forge at .claude/skills/forge, remove it by running `for s in browse plan-ceo-review plan-eng-review review ship retro qa setup-browser-cookies; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge` and remove the forge section from the project CLAUDE.md too.
+> Uninstall forge: remove the skill symlinks by running `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f ~/.claude/skills/$s; done` then run `rm -rf ~/.claude/skills/forge` and remove the forge section from CLAUDE.md. If this project also has forge at .claude/skills/forge, remove it by running `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge` and remove the forge section from the project CLAUDE.md too.
 
 ## Development
 

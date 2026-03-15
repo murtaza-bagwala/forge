@@ -1,5 +1,5 @@
 ---
-name: review
+name: audit
 version: 1.0.0
 description: |
   Pre-landing PR review. Analyzes diff against main for SQL safety, LLM trust
@@ -13,12 +13,20 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 ---
+<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
+<!-- Regenerate: bun run gen:skill-docs -->
 
-{{UPDATE_CHECK}}
+## Update Check (run first)
+
+```bash
+_UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skills/forge/bin/forge-update-check 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+```
+
 
 # Pre-Landing PR Review
 
-You are running the `/review` workflow. Analyze the current branch's diff against main for structural issues that tests don't catch.
+You are running the `/audit` workflow. Analyze the current branch's diff against main for structural issues that tests don't catch.
 
 ---
 

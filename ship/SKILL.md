@@ -22,7 +22,6 @@ _UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skil
 [ -n "$_UPD" ] && echo "$_UPD" || true
 ```
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/forge/forge-upgrade/SKILL.md` and follow the "Inline upgrade flow" (AskUserQuestion → upgrade if yes, `touch ~/.forge/last-update-check` if no). If `JUST_UPGRADED <from> <to>`: tell user "Running forge v{to} (just updated!)" and continue.
 
 # Ship: Fully Automated Ship Workflow
 
@@ -157,7 +156,7 @@ If multiple suites need to run, run them sequentially (each needs a test lane). 
 
 Review the diff for structural issues that tests don't catch.
 
-1. Read `.claude/skills/review/checklist.md`. If the file cannot be read, **STOP** and report the error.
+1. Read `.claude/skills/audit/checklist.md`. If the file cannot be read, **STOP** and report the error.
 
 2. Run `git diff origin/main` to get the full diff (scoped to feature changes against the freshly-fetched remote main).
 
@@ -185,7 +184,7 @@ Save the review output — it goes into the PR body in Step 8.
 
 ## Step 3.75: Address Greptile review comments (if PR exists)
 
-Read `.claude/skills/review/greptile-triage.md` and follow the fetch, filter, and classify steps.
+Read `.claude/skills/audit/greptile-triage.md` and follow the fetch, filter, and classify steps.
 
 **If no PR exists, `gh` fails, API returns an error, or there are zero Greptile comments:** Skip this step silently. Continue to Step 4.
 

@@ -19,13 +19,11 @@ const ROOT = path.resolve(import.meta.dir, '..');
 const SKILL_FILES = [
   'SKILL.md',
   'browse/SKILL.md',
-  'qa/SKILL.md',
+  'test/SKILL.md',
   'ship/SKILL.md',
-  'review/SKILL.md',
-  'retro/SKILL.md',
-  'plan-ceo-review/SKILL.md',
-  'plan-eng-review/SKILL.md',
-  'setup-browser-cookies/SKILL.md',
+  'audit/SKILL.md',
+  'plan-product-audit/SKILL.md',
+  'plan-eng-audit/SKILL.md',
 ].filter(f => fs.existsSync(path.join(ROOT, f)));
 
 let hasErrors = false;

@@ -1,5 +1,5 @@
 ---
-name: qa
+name: probe
 version: 1.0.0
 description: |
   Systematically QA test a web application. Use when asked to "qa", "QA", "test this site",
@@ -13,10 +13,18 @@ allowed-tools:
   - Write
   - AskUserQuestion
 ---
+<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
+<!-- Regenerate: bun run gen:skill-docs -->
 
-{{UPDATE_CHECK}}
+## Update Check (run first)
 
-# /qa: Systematic QA Testing
+```bash
+_UPD=$(~/.claude/skills/forge/bin/forge-update-check 2>/dev/null || .claude/skills/forge/bin/forge-update-check 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+```
+
+
+# /probe: Systematic QA Testing
 
 You are a QA engineer. Test web applications like a real user — click everything, fill every form, check every state. Produce a structured report with evidence.
 
@@ -36,7 +44,24 @@ You are a QA engineer. Test web applications like a real user — click everythi
 
 **Find the browse binary:**
 
-{{BROWSE_SETUP}}
+## SETUP (run this check BEFORE any browse command)
+
+```bash
+_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+B=""
+[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/forge/browse/dist/browse" ] && B="$_ROOT/.claude/skills/forge/browse/dist/browse"
+[ -z "$B" ] && B=~/.claude/skills/forge/browse/dist/browse
+if [ -x "$B" ]; then
+  echo "READY: $B"
+else
+  echo "NEEDS_SETUP"
+fi
+```
+
+If `NEEDS_SETUP`:
+1. Tell the user: "forge browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+2. Run: `cd <SKILL_DIR> && ./setup`
+3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
 **Create output directories:**
 
@@ -51,7 +76,7 @@ mkdir -p "$REPORT_DIR/screenshots"
 
 ### Diff-aware (automatic when on a feature branch with no URL)
 
-This is the **primary mode** for developers verifying their work. When the user says `/qa` without a URL and the repo is on a feature branch, automatically:
+This is the **primary mode** for developers verifying their work. When the user says `/probe` without a URL and the repo is on a feature branch, automatically:
 
 1. **Analyze the branch diff** to understand what changed:
    ```bash

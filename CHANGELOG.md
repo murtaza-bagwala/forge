@@ -18,11 +18,11 @@
 - **Stream-json NDJSON parser** — `parseNDJSON()` pure function for real-time E2E progress from `claude -p --output-format stream-json --verbose`.
 - **Eval persistence** — results saved to `~/.forge-dev/evals/` with auto-comparison against previous run.
 - **Eval CLI tools** — `eval:list`, `eval:compare`, `eval:summary` for inspecting eval history.
-- **All 9 skills converted to `.tmpl` templates** — plan-ceo-review, plan-eng-review, retro, review, ship now use `{{UPDATE_CHECK}}` placeholder. Single source of truth for update check preamble.
+- **All 9 skills converted to `.tmpl` templates** — plan-product-review, plan-eng-review, review, ship now use `{{UPDATE_CHECK}}` placeholder. Single source of truth for update check preamble.
 - **3-tier eval suite** — Tier 1: static validation (free), Tier 2: E2E via `claude -p` (~$3.85/run), Tier 3: LLM-as-judge (~$0.15/run). Gated by `EVALS=1`.
 - **Planted-bug outcome testing** — eval fixtures with known bugs, LLM judge scores detection.
 - 15 observability unit tests covering heartbeat schema, progress.log format, NDJSON naming, savePartial, finalize, watcher rendering, stale detection, non-fatal I/O.
-- E2E tests for plan-ceo-review, plan-eng-review, retro skills.
+- E2E tests for plan-product-review, plan-eng-review, retro skills.
 - Update-check exit code regression tests.
 - `test/helpers/skill-parser.ts` — `getRemoteSlug()` for git remote detection.
 
@@ -30,7 +30,7 @@
 - **Browse binary discovery broken for agents** — replaced `find-browse` indirection with explicit `browse/dist/browse` path in SKILL.md setup blocks.
 - **Update check exit code 1 misleading agents** — added `|| true` to prevent non-zero exit when no update available.
 - **browse/SKILL.md missing setup block** — added `{{BROWSE_SETUP}}` placeholder.
-- **plan-ceo-review timeout** — init git repo in test dir, skip codebase exploration, bump timeout to 420s.
+- **plan-product-review timeout** — init git repo in test dir, skip codebase exploration, bump timeout to 420s.
 - Planted-bug eval reliability — simplified prompts, lowered detection baselines, resilient to max_turns flakes.
 
 ### Changed
@@ -76,13 +76,13 @@
 - Crash log path references updated from `/tmp/` to `.forge/`
 
 ### Added
-- **Diff-aware QA mode** — `/qa` on a feature branch auto-analyzes `git diff`, identifies affected pages/routes, detects the running app on localhost, and tests only what changed. No URL needed.
+- **Diff-aware QA mode** — `/probe` on a feature branch auto-analyzes `git diff`, identifies affected pages/routes, detects the running app on localhost, and tests only what changed. No URL needed.
 - **Project-local browse state** — state file, logs, and all server state now live in `.forge/` inside the project root (detected via `git rev-parse --show-toplevel`). No more `/tmp` state files.
 - **Shared config module** (`browse/src/config.ts`) — centralizes path resolution for CLI and server, eliminates duplicated port/state logic
 - **Random port selection** — server picks a random port 10000-60000 instead of scanning 9400-9409. No more CONDUCTOR_PORT magic offset. No more port collisions across workspaces.
 - **Binary version tracking** — state file includes `binaryVersion` SHA; CLI auto-restarts the server when the binary is rebuilt
 - **Legacy /tmp cleanup** — CLI scans for and removes old `/tmp/browse-server*.json` files, verifying PID ownership before sending signals
-- **Greptile integration** — `/review` and `/ship` fetch and triage Greptile bot comments; `/retro` tracks Greptile batting average across weeks
+- **Greptile integration** — `/audit` and `/ship` fetch and triage Greptile bot comments; `/retro` tracks Greptile batting average across weeks
 - **Local dev mode** — `bin/dev-setup` symlinks skills from the repo for in-place development; `bin/dev-teardown` restores global install
 - `help` command — agents can self-discover all commands and snapshot flags
 - Version-aware `find-browse` with META signal protocol — detects stale binaries and prompts agents to update
@@ -99,7 +99,7 @@
 - Atomic state file writes: `.json.tmp` → rename (prevents partial reads)
 - CLI passes `BROWSE_STATE_FILE` to spawned server (server derives all paths from it)
 - SKILL.md setup checks parse META signals and handle `META:UPDATE_AVAILABLE`
-- `/qa` SKILL.md now describes four modes (diff-aware, full, quick, regression) with diff-aware as the default on feature branches
+- `/probe` SKILL.md now describes four modes (diff-aware, full, quick, regression) with diff-aware as the default on feature branches
 - `jsonResponse`/`errorResponse` use options objects to prevent positional parameter confusion
 - Build script compiles both `browse` and `find-browse` binaries, cleans up `.bun-build` temp files
 - README updated with Greptile setup instructions, diff-aware QA examples, and revised demo transcript
@@ -127,7 +127,7 @@
 
 ### Phase 3: /qa skill — systematic QA testing
 
-- New `/qa` skill with 6-phase workflow (Initialize, Authenticate, Orient, Explore, Document, Wrap up)
+- New `/probe` skill with 6-phase workflow (Initialize, Authenticate, Orient, Explore, Document, Wrap up)
 - Three modes: full (systematic, 5-10 issues), quick (30-second smoke test), regression (compare against baseline)
 - Issue taxonomy: 7 categories, 4 severity levels, per-page exploration checklist
 - Structured report template with health score (0-100, weighted across 7 categories)
@@ -171,7 +171,7 @@
 
 Initial release.
 
-- Five skills: `/plan-ceo-review`, `/plan-eng-review`, `/review`, `/ship`, `/browse`
+- Five skills: `/plan-product-review`, `/plan-eng-review`, `/audit`, `/ship`, `/browse`
 - Headless browser CLI with 40+ commands, ref-based interaction, persistent Chromium daemon
 - One-command install as Claude Code skills (submodule or global clone)
 - `setup` script for binary compilation and skill symlinking

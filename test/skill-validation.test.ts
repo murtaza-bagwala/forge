@@ -157,10 +157,8 @@ describe('Generated SKILL.md freshness', () => {
 describe('Update check preamble', () => {
   const skillsWithUpdateCheck = [
     'SKILL.md', 'browse/SKILL.md', 'qa/SKILL.md',
-    'setup-browser-cookies/SKILL.md',
-    'ship/SKILL.md', 'review/SKILL.md',
-    'plan-ceo-review/SKILL.md', 'plan-eng-review/SKILL.md',
-    'retro/SKILL.md',
+    'ship/SKILL.md', 'audit/SKILL.md',
+    'plan-product-audit/SKILL.md', 'plan-eng-audit/SKILL.md',
   ];
 
   for (const skill of skillsWithUpdateCheck) {
@@ -225,7 +223,7 @@ describe('Cross-skill path consistency', () => {
 
   test('all greptile-history write references specify both per-project and global paths', () => {
     const filesToCheck = [
-      'review/SKILL.md',
+      'audit/SKILL.md',
       'ship/SKILL.md',
       'review/greptile-triage.md',
     ];
@@ -248,8 +246,6 @@ describe('Cross-skill path consistency', () => {
     expect(content).toContain('~/.forge/greptile-history.md');
   });
 
-  test('retro/SKILL.md reads global greptile-history (not per-project)', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
     expect(content).toContain('~/.forge/greptile-history.md');
     // Should NOT reference per-project path for reads
     expect(content).not.toContain('$REMOTE_SLUG/greptile-history.md');
@@ -341,7 +337,7 @@ describe('Greptile history format consistency', () => {
     expect(content).toContain('<category>');
   });
 
-  test('review/SKILL.md and ship/SKILL.md both reference greptile-triage.md for write details', () => {
+  test('audit/SKILL.md and ship/SKILL.md both reference greptile-triage.md for write details', () => {
     const reviewContent = fs.readFileSync(path.join(ROOT, 'review', 'SKILL.md'), 'utf-8');
     const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
 

@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe('session-runner observability', () => {
   test('1: sanitizeTestName strips slashes and leading dashes', () => {
-    expect(sanitizeTestName('/plan-ceo-review')).toBe('plan-ceo-review');
+    expect(sanitizeTestName('/plan-product-review')).toBe('plan-product-review');
     expect(sanitizeTestName('browse-basic')).toBe('browse-basic');
     expect(sanitizeTestName('/qa/deep/test')).toBe('qa-deep-test');
     expect(sanitizeTestName('///leading')).toBe('leading');
@@ -202,7 +202,7 @@ describe('eval-watch dashboard', () => {
     const heartbeat: HeartbeatData = {
       runId: '20260314-143022',
       startedAt: '2026-03-14T14:30:22Z',
-      currentTest: 'plan-ceo-review',
+      currentTest: 'plan-product-review',
       status: 'running',
       turn: 4,
       toolCount: 3,
@@ -232,7 +232,7 @@ describe('eval-watch dashboard', () => {
     expect(output).toContain('$0.17');
 
     // Should show current test
-    expect(output).toContain('plan-ceo-review');
+    expect(output).toContain('plan-product-review');
     expect(output).toContain('turn 4');
     expect(output).toContain('Write(review-output.md)');
 
@@ -246,7 +246,7 @@ describe('eval-watch dashboard', () => {
     const heartbeat: HeartbeatData = {
       runId: '20260314-143022',
       startedAt: '2026-03-14T14:30:22Z',
-      currentTest: 'plan-ceo-review',
+      currentTest: 'plan-product-review',
       status: 'running',
       turn: 4,
       toolCount: 3,
