@@ -207,7 +207,7 @@ describe('Cross-skill path consistency', () => {
       allPatterns.push(...filePatterns);
     }
 
-    // Should find at least 2 occurrences (qa/SKILL.md + review/greptile-triage.md)
+    // Should find at least 2 occurrences (qa/SKILL.md + audit/checklist.md)
     expect(allPatterns.length).toBeGreaterThanOrEqual(2);
 
     // All occurrences must be character-for-character identical
@@ -221,36 +221,7 @@ describe('Cross-skill path consistency', () => {
     }
   });
 
-  test('all greptile-history write references specify both per-project and global paths', () => {
-    const filesToCheck = [
-      'audit/SKILL.md',
-      'ship/SKILL.md',
-      'review/greptile-triage.md',
-    ];
 
-    for (const file of filesToCheck) {
-      const filePath = path.join(ROOT, file);
-      if (!fs.existsSync(filePath)) continue;
-      const content = fs.readFileSync(filePath, 'utf-8');
-
-      const hasBoth = (content.includes('per-project') && content.includes('global')) ||
-        (content.includes('$REMOTE_SLUG/greptile-history') && content.includes('~/.forge/greptile-history'));
-
-      expect(hasBoth).toBe(true);
-    }
-  });
-
-  test('greptile-triage.md contains both project and global history paths', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'review', 'greptile-triage.md'), 'utf-8');
-    expect(content).toContain('$REMOTE_SLUG/greptile-history.md');
-    expect(content).toContain('~/.forge/greptile-history.md');
-  });
-
-    expect(content).toContain('~/.forge/greptile-history.md');
-    // Should NOT reference per-project path for reads
-    expect(content).not.toContain('$REMOTE_SLUG/greptile-history.md');
-  });
-});
 
 // --- Part 7: QA skill structure validation (A2) ---
 
@@ -325,37 +296,6 @@ describe('QA skill structure validation', () => {
   });
 });
 
-// --- Part 7: Greptile history format consistency (A3) ---
-
-describe('Greptile history format consistency', () => {
-  test('greptile-triage.md defines the canonical history format', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'review', 'greptile-triage.md'), 'utf-8');
-    expect(content).toContain('<YYYY-MM-DD>');
-    expect(content).toContain('<owner/repo>');
-    expect(content).toContain('<type');
-    expect(content).toContain('<file-pattern>');
-    expect(content).toContain('<category>');
-  });
-
-  test('audit/SKILL.md and ship/SKILL.md both reference greptile-triage.md for write details', () => {
-    const reviewContent = fs.readFileSync(path.join(ROOT, 'review', 'SKILL.md'), 'utf-8');
-    const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
-
-    expect(reviewContent.toLowerCase()).toContain('greptile-triage.md');
-    expect(shipContent.toLowerCase()).toContain('greptile-triage.md');
-  });
-
-  test('greptile-triage.md defines all 9 valid categories', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'review', 'greptile-triage.md'), 'utf-8');
-    const categories = [
-      'race-condition', 'null-check', 'error-handling', 'style',
-      'type-safety', 'security', 'performance', 'correctness', 'other',
-    ];
-    for (const cat of categories) {
-      expect(content).toContain(cat);
-    }
-  });
-});
 
 // --- Part 7: Planted-bug fixture validation (A4) ---
 
