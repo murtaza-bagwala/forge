@@ -17,6 +17,7 @@ Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/e
 
 | Skill | Mode | What it does |
 |-------|------|--------------|
+| `/forge` | Help & index | List all available skills with descriptions and quick-start examples. Start here. |
 | `/plan-product-review` | Founder / CEO | Rethink the problem. Find the 10-star product hiding inside the request. |
 | `/plan-eng-review` | Eng manager / tech lead | Lock in architecture, data flow, diagrams, edge cases, and tests. |
 | `/audit` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. |

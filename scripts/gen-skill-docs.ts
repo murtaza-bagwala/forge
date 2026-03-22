@@ -173,7 +173,6 @@ function processTemplate(tmplPath: string): { outputPath: string; content: strin
 function findTemplates(): string[] {
   const templates: string[] = [];
   const candidates = [
-    path.join(ROOT, 'SKILL.md.tmpl'),
     path.join(ROOT, 'browse', 'SKILL.md.tmpl'),
     path.join(ROOT, 'qa', 'SKILL.md.tmpl'),
     path.join(ROOT, 'ship', 'SKILL.md.tmpl'),
