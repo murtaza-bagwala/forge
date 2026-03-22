@@ -2,40 +2,54 @@
 # forge setup — build browser binary + register all skills with Claude Code
 set -e
 
-GSTACK_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILLS_DIR="$(dirname "$GSTACK_DIR")"
-BROWSE_BIN="$GSTACK_DIR/browse/dist/browse"
+FORGE_DIR="$(cd "$(dirname "$0")" && pwd)"
+SKILLS_DIR="$(dirname "$FORGE_DIR")"
+BROWSE_BIN="$FORGE_DIR/browse/dist/browse"
+
+# ── 1. Ensure bun is available (auto-install if missing) ──────────────────────
+if ! command -v bun >/dev/null 2>&1; then
+  if [ -x "$HOME/.bun/bin/bun" ]; then
+    export PATH="$HOME/.bun/bin:$PATH"
+  else
+    echo "Installing bun (required to build the browse binary)..."
+    curl -fsSL https://bun.sh/install | bash >/dev/null 2>&1
+    export PATH="$HOME/.bun/bin:$PATH"
+    # Persist to shell profile
+    for rc in ~/.zshrc ~/.bashrc; do
+      [ -f "$rc" ] && grep -q '.bun/bin' "$rc" || echo 'export PATH="$HOME/.bun/bin:$PATH"' >> "$rc"
+    done
+    echo "  bun installed."
+  fi
+fi
 
 ensure_playwright_browser() {
   (
-    cd "$GSTACK_DIR"
+    cd "$FORGE_DIR"
     bun --eval 'import { chromium } from "playwright"; const browser = await chromium.launch(); await browser.close();'
   ) >/dev/null 2>&1
 }
 
-# 1. Build browse binary if needed (smart rebuild: stale sources, package.json, lock)
+# ── 2. Build browse binary if needed ─────────────────────────────────────────
 NEEDS_BUILD=0
 if [ ! -x "$BROWSE_BIN" ]; then
   NEEDS_BUILD=1
-elif [ -n "$(find "$GSTACK_DIR/browse/src" -type f -newer "$BROWSE_BIN" -print -quit 2>/dev/null)" ]; then
+elif [ -n "$(find "$FORGE_DIR/browse/src" -type f -newer "$BROWSE_BIN" -print -quit 2>/dev/null)" ]; then
   NEEDS_BUILD=1
-elif [ "$GSTACK_DIR/package.json" -nt "$BROWSE_BIN" ]; then
+elif [ "$FORGE_DIR/package.json" -nt "$BROWSE_BIN" ]; then
   NEEDS_BUILD=1
-elif [ -f "$GSTACK_DIR/bun.lock" ] && [ "$GSTACK_DIR/bun.lock" -nt "$BROWSE_BIN" ]; then
+elif [ -f "$FORGE_DIR/bun.lock" ] && [ "$FORGE_DIR/bun.lock" -nt "$BROWSE_BIN" ]; then
   NEEDS_BUILD=1
 fi
 
 if [ "$NEEDS_BUILD" -eq 1 ]; then
-  echo "Building browse binary..."
+  echo "Building browse binary (~10 seconds)..."
   (
-    cd "$GSTACK_DIR"
-    bun install
-    bun run build
+    cd "$FORGE_DIR"
+    bun install --silent
+    bun build --compile browse/src/cli.ts --outfile browse/dist/browse
+    bun build --compile browse/src/find-browse.ts --outfile browse/dist/find-browse
+    git rev-parse HEAD > browse/dist/.version 2>/dev/null || true
   )
-  # Safety net: write .version if build script didn't (e.g., git not available during build)
-  if [ ! -f "$GSTACK_DIR/browse/dist/.version" ]; then
-    git -C "$GSTACK_DIR" rev-parse HEAD > "$GSTACK_DIR/browse/dist/.version" 2>/dev/null || true
-  fi
 fi
 
 if [ ! -x "$BROWSE_BIN" ]; then
@@ -43,13 +57,10 @@ if [ ! -x "$BROWSE_BIN" ]; then
   exit 1
 fi
 
-# 2. Ensure Playwright's Chromium is available
+# ── 3. Ensure Playwright's Chromium is available ──────────────────────────────
 if ! ensure_playwright_browser; then
-  echo "Installing Playwright Chromium..."
-  (
-    cd "$GSTACK_DIR"
-    bunx playwright install chromium
-  )
+  echo "Installing Chromium (~200MB, one-time)..."
+  (cd "$FORGE_DIR" && bunx playwright install chromium) 2>&1 | grep -E "Downloading|installed to|Error" || true
 fi
 
 if ! ensure_playwright_browser; then
@@ -57,41 +68,35 @@ if ! ensure_playwright_browser; then
   exit 1
 fi
 
-# 3. Ensure ~/.forge global state directory exists
+# ── 4. Create ~/.forge state directory ────────────────────────────────────────
 mkdir -p "$HOME/.forge/projects"
 
-# 4. Only create skill symlinks if we're inside a .claude/skills directory
+# ── 5. Symlink skills into ~/.claude/skills/ (only when inside that dir) ──────
 SKILLS_BASENAME="$(basename "$SKILLS_DIR")"
 if [ "$SKILLS_BASENAME" = "skills" ]; then
   linked=()
-  for skill_dir in "$GSTACK_DIR"/*/; do
+  for skill_dir in "$FORGE_DIR"/*/; do
     if [ -f "$skill_dir/SKILL.md" ]; then
       skill_name="$(basename "$skill_dir")"
-      # Skip node_modules
       [ "$skill_name" = "node_modules" ] && continue
       target="$SKILLS_DIR/$skill_name"
-      # Create or update symlink; skip if a real file/directory exists
       if [ -L "$target" ] || [ ! -e "$target" ]; then
         ln -snf "forge/$skill_name" "$target"
         linked+=("$skill_name")
       fi
     fi
   done
-
-  echo "forge ready."
-  echo "  browse: $BROWSE_BIN"
-  if [ ${#linked[@]} -gt 0 ]; then
-    echo "  linked skills: ${linked[*]}"
-  fi
+  echo ""
+  echo "✓ Forge is ready!"
+  echo "  Skills: ${linked[*]}"
+  echo "  Browser: $BROWSE_BIN"
+  echo ""
+  echo "  Open Claude Code and try: /browse goto https://example.com"
 else
-  echo "forge ready."
-  echo "  browse: $BROWSE_BIN"
-  echo "  (skipped skill symlinks — not inside .claude/skills/)"
+  echo ""
+  echo "✓ Forge is ready!"
+  echo "  Browser: $BROWSE_BIN"
+  echo "  (Run from inside ~/.claude/skills/ to register skill symlinks)"
 fi
 
-# 4. First-time welcome + legacy cleanup
-if [ ! -d "$HOME/.forge" ]; then
-  mkdir -p "$HOME/.forge"
-  echo "  Welcome! Run anytime to stay current."
-fi
 rm -f /tmp/forge-latest-version

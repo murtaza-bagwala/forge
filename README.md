@@ -93,26 +93,34 @@ This is the setup I use. One person, ten parallel agents, each with the right co
 
 **Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Git](https://git-scm.com/), [Bun](https://bun.sh/) v1.0+. `/browse` compiles a native binary — works on macOS and Linux (x64 and arm64).
 
-### Step 1: Install on your machine
+### Install — one command
 
-Open Claude Code and paste this. Claude will do the rest.
+```bash
+git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup
+```
 
-> Install forge: run `git clone https://github.com/murtaza-bagwala/forge.git ~/.claude/skills/forge && cd ~/.claude/skills/forge && ./setup` then add a "forge" section to CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, and lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /probe. Then ask the user if they also want to add forge to the current project so teammates get it.
+That's it. The setup script handles everything automatically:
+- Installs [Bun](https://bun.sh) if you don't have it
+- Builds the `/browse` browser binary (~10 seconds)
+- Downloads Chromium (~200MB, one-time)
+- Registers all skills in Claude Code
 
-### Step 2: Add to your repo so teammates get it (optional)
+Then open a **new Claude Code session** — the skills are live.
 
-> Add forge to this project: run `cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup` then add a "forge" section to this project's CLAUDE.md that says to use the /browse skill from forge for all web browsing, never use mcp\_\_claude-in-chrome\_\_\* tools, lists the available skills: /plan-product-review, /plan-eng-review, /audit, /ship, /browse, /probe, and tells Claude that if forge skills aren't working, run `cd .claude/skills/forge && ./setup` to build the binary and register skills.
+### Add to a project so teammates get it (optional)
 
-Real files get committed to your repo (not a submodule), so `git clone` just works. The binary and node\_modules are gitignored — teammates just need to run `cd .claude/skills/forge && ./setup` once to build (or `/browse` handles it automatically on first use).
+```bash
+cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup
+```
+
+Commits the skill files to your repo. Teammates run `./setup` once after cloning — no other setup needed.
 
 ### What gets installed
 
-- Skill files (Markdown prompts) in `~/.claude/skills/forge/` (or `.claude/skills/forge/` for project installs)
-- Symlinks at `~/.claude/skills/browse`, `~/.claude/skills/probe`, `~/.claude/skills/audit`, etc. pointing into the forge directory
-- Browser binary at `browse/dist/browse` (~58MB, gitignored)
-- `node_modules/` (gitignored)
+- 6 skill files (plain Markdown) in `~/.claude/skills/`
+- A headless browser binary for `/browse` and `/probe` (~58MB, gitignored)
 
-Everything lives inside `.claude/`. Nothing touches your PATH or runs in the background.
+Everything lives inside `.claude/`. Nothing touches your system PATH or runs in the background.
 
 ---
 
