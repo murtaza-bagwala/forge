@@ -80,16 +80,6 @@ You already use Claude Code heavily and want consistent, high-rigor workflows in
 
 This is not a prompt pack for beginners. It is an operating system for people who ship.
 
-## How to fly: 10 sessions at once
-
-forge is powerful with one Claude Code session. It is transformative with ten.
-
-[Conductor](https://conductor.build) runs multiple Claude Code sessions in parallel — each in its own isolated workspace. That means you can have one session running `/probe` on staging, another doing `/audit` on a PR, a third implementing a feature, and seven more working on other branches. All at the same time.
-
-Each workspace gets its own isolated browser instance automatically — separate Chromium process, cookies, tabs, and logs stored in `.forge/` inside each project root. No port collisions, no shared state, no configuration needed. `/browse` and `/probe` sessions never interfere with each other, even across ten parallel workspaces.
-
-This is the setup I use. One person, ten parallel agents, each with the right cognitive mode for its task. That is not incremental improvement. That is a different way of building software.
-
 ## Install
 
 **Requirements:** [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Git](https://git-scm.com/), [Bun](https://bun.sh/) v1.0+. `/browse` compiles a native binary — works on macOS and Linux (x64 and arm64).
@@ -449,20 +439,6 @@ Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
 Reports and screenshots accumulate in `.forge/qa-reports/` so you can track quality over time and compare runs.
 
 ---
-
-## Troubleshooting
-
-**Skill not showing up in Claude Code?**
-Run `cd ~/.claude/skills/forge && ./setup` (or `cd .claude/skills/forge && ./setup` for project installs). This rebuilds symlinks so Claude can discover the skills.
-
-**`/browse` fails or binary not found?**
-Run `cd ~/.claude/skills/forge && bun install && bun run build`. This compiles the browser binary. Requires Bun v1.0+.
-
-**Project copy is stale?**
-Re-copy from global: `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
-
-**`bun` not installed?**
-Install it: `curl -fsSL https://bun.sh/install | bash`
 
 ## Upgrading
 
