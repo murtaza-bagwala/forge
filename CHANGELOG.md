@@ -57,8 +57,6 @@
 - `test/helpers/skill-parser.ts` — extracts and validates `$B` commands from Markdown
 - `test/helpers/session-runner.ts` — Agent SDK wrapper with error pattern scanning and transcript saving
 - **ARCHITECTURE.md** — design decisions document covering daemon model, security, ref system, logging, crash recovery
-- **Conductor integration** (`conductor.json`) — lifecycle hooks for workspace setup/teardown
-- **`.env` propagation** — `bin/dev-setup` copies `.env` from main worktree into Conductor workspaces automatically
 - `.env.example` template for API key configuration
 
 ### Changed
@@ -79,7 +77,7 @@
 - **Diff-aware QA mode** — `/probe` on a feature branch auto-analyzes `git diff`, identifies affected pages/routes, detects the running app on localhost, and tests only what changed. No URL needed.
 - **Project-local browse state** — state file, logs, and all server state now live in `.forge/` inside the project root (detected via `git rev-parse --show-toplevel`). No more `/tmp` state files.
 - **Shared config module** (`browse/src/config.ts`) — centralizes path resolution for CLI and server, eliminates duplicated port/state logic
-- **Random port selection** — server picks a random port 10000-60000 instead of scanning 9400-9409. No more CONDUCTOR_PORT magic offset. No more port collisions across workspaces.
+- **Random port selection** — server picks a random port 10000-60000 instead of scanning 9400-9409. No more port collisions across parallel sessions.
 - **Binary version tracking** — state file includes `binaryVersion` SHA; CLI auto-restarts the server when the binary is rebuilt
 - **Legacy /tmp cleanup** — CLI scans for and removes old `/tmp/browse-server*.json` files, verifying PID ownership before sending signals
 - **Greptile integration** — `/audit` and `/ship` fetch and triage Greptile bot comments; `/retro` tracks Greptile batting average across weeks

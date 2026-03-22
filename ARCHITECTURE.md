@@ -73,7 +73,7 @@ The CLI reads this file to find the server. If the file is missing, stale, or th
 
 ### Port selection
 
-Random port between 10000-60000 (retry up to 5 on collision). This means 10 Conductor workspaces can each run their own browse daemon with zero configuration and zero port conflicts. The old approach (scanning 9400-9409) broke constantly in multi-workspace setups.
+Random port between 10000-60000 (retry up to 5 on collision). This means multiple parallel sessions can each run their own browse daemon with zero configuration and zero port conflicts.
 
 ### Version auto-restart
 
