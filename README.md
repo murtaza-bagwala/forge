@@ -27,51 +27,63 @@ Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/e
 
 ## Demo: one feature, five modes
 
-I start almost every feature in plan mode. I describe what I want to build, then use `/plan-product-review` to pressure-test whether I am even building the right thing. Only after the product direction is locked do I shift into engineering, review, ship, and test.
+The app: **quick-notes** — a simple Bun note-taking app with a form to add notes,
+a list view, a delete button per note, and a `/api/notes` JSON endpoint.
+
+The feature request: add a search bar so users can filter notes by title or content.
 
 ```
-You:   [enter plan mode, describe the feature]
-       I want to add seller photo upload to the listing app. Sellers
-       should be able to upload a photo of their item and we create
-       the listing from it.
+You:   I want to add a search bar to quick-notes so users can filter
+       notes by title or content as they type.
 
 You:   /plan-product-review
 
-Claude: "Photo upload" is not the feature. The real job is helping sellers
-        create listings that actually sell. Here's what the 10-star version
-        looks like: auto-identify the product from the photo, pull specs and
-        pricing comps from the web, draft the title and description, suggest
-        the best hero image...
+Claude: "Search bar" undersells the feature. The real job is helping
+        users find the right note fast — especially once notes pile up.
+        The 10-star version feels instant: type a word, notes filter in
+        real time with no page reload, matched keyword highlighted, and
+        a count showing "3 of 12 notes". Empty query restores all notes.
+        That's not more work — it's the same feature done right.
 
 You:   /plan-eng-review
 
-Claude: [Architecture diagram, state machine for upload → classify → enrich
-        → draft pipeline, async job boundaries, failure modes, test matrix]
+Claude: Client-side JS filter — no new server routes needed.
+        Implementation: input event listener → filter fn → toggle
+        .hidden class on note cards. Case-insensitive match across
+        title + body. Highlight matches with <mark> tags. Edge cases:
+        empty query → show all, no matches → show "nothing found" state.
+        15-20 lines of vanilla JS added inline to server.ts.
 
-You:   [exit plan mode, implement the plan]
+You:   [implement the plan — add search input + filter script to server.ts]
 
 You:   /audit
 
-Claude: Race condition: two tabs can overwrite cover-photo selection.
-        Trust boundary: pulling web data into draft generation creates
-        a prompt injection vector. Missing: orphan cleanup for failed uploads.
+Claude: XSS: n.title and n.body are injected directly into innerHTML
+        with no escaping — a note body containing <script>alert(1)</script>
+        executes in the browser. Fix: escape HTML before rendering.
+        Also missing: empty state message when search finds no matches.
 
-You:   (fix the issues)
+You:   (fix XSS, add empty search state)
 
 You:   /ship
 
-Claude: [Syncs main, runs tests, pushes branch, opens PR — 6 tool calls, done]
+Claude: [Runs bun test, commits "add real-time note search with XSS fix",
+        pushes branch, opens PR — done in 5 tool calls]
 
 You:   /probe
 
-Claude: Analyzing branch diff... 8 files changed, 3 routes affected.
-        [Tests /listings/new, /listings/:id, /api/listings against localhost:3000]
-        All 3 routes working. Upload + enrichment flow passes end to end.
+Claude: Analyzing diff... 1 file changed: server.ts
+        App detected on localhost:3000.
 
-You:   /probe https://staging.myapp.com --quick
+        ✓ Homepage loads, add-note form renders
+        ✓ Created 3 notes — all appear correctly
+        ✓ Search "meeting" filters to matching notes instantly
+        ✓ Clearing search restores all notes
+        ✓ Search with no matches shows "nothing found" state
+        ✓ XSS fix verified — <script> tags render as escaped text
+        ✓ No console errors
 
-Claude: [Smoke test: homepage + 5 pages, 30 seconds]
-        Health Score: 91/100. No critical issues. 1 medium: mobile nav overlap.
+        All flows passing. Ready to merge.
 ```
 
 ## Who this is for
