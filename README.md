@@ -2,7 +2,7 @@
 
 **Forge turns Claude Code from one generic assistant into a team of specialists you can summon on demand.**
 
-Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Plan review, code review, one-command shipping, browser automation, QA testing, and engineering retrospectives — all as slash commands.
+Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Plan review, code review, database design, one-command shipping, browser automation, and QA testing — all as slash commands.
 
 ### Without forge
 
@@ -10,7 +10,6 @@ Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/e
 - It will implement exactly what you said, even when the real product is something bigger
 - "Review my PR" gives inconsistent depth every time
 - "Ship this" turns into a long back-and-forth about what to do
-- The agent can write code but can't see your app — it's half blind
 - You still do QA by hand: open browser, click around, check pages, squint at layouts
 
 ### With forge
@@ -22,8 +21,8 @@ Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/e
 | `/plan-eng-review` | Eng manager / tech lead | Lock in architecture, data flow, diagrams, edge cases, and tests. |
 | `/audit` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. |
 | `/ship` | Release engineer | Sync main, run tests, push, open PR. For a ready branch, not for deciding what to build. |
-| `/browse` | QA engineer | Give the agent eyes. It logs in, clicks through your app, takes screenshots, catches breakage. Full QA pass in 60 seconds. |
 | `/probe` | QA lead | Systematic QA testing. On a feature branch, auto-analyzes your diff, identifies affected pages, and tests them. Also: full exploration, quick smoke test, regression mode. |
+| `/design-db` | Database architect | Interactive database design workshop. SQL vs NoSQL decision framework, ER diagrams, full schema with indexes and constraints, production checklist, anti-pattern callouts. |
 
 ## Demo: one feature, five modes
 
@@ -338,72 +337,11 @@ I want the plane landed.
 
 ---
 
-## `/browse`
-
-This is my **QA engineer mode**.
-
-`/browse` is the skill that closes the loop. Before it, the agent could think and code but was still half blind. It had to guess about UI state, auth flows, redirects, console errors, empty states, and broken layouts. Now it can just go look.
-
-That is a real step-change. The full cycle becomes: plan, code, run the app, inspect the UI, reproduce the bug, verify the fix, ship. QA stops being "go click around manually" and becomes part of the same agentic loop. It gives the agent eyes. Now it can do the boring, high-context QA work itself: click through the app, catch breakage, verify the fix, and keep going. That feels like having a real operator in the machine.
-
-It is a compiled binary that talks to a persistent Chromium daemon — built on [Playwright](https://playwright.dev/) by Microsoft. First call starts the browser (~3s). Every call after that: ~100-200ms. The browser stays running between commands, so cookies, tabs, and localStorage carry over.
-
-After I push a branch, I tell Claude to go check staging. It does the entire QA pass for me:
-
-```
-You:   /browse staging.myapp.com — log in, test the signup flow, and check
-       every page I changed in this branch
-
-Claude: [18 tool calls, ~60 seconds]
-
-        > browse goto https://staging.myapp.com/signup
-        > browse snapshot -i
-        > browse fill @e2 "test@example.com"
-        > browse fill @e3 "password123"
-        > browse click @e5                    (Submit)
-        > browse screenshot /tmp/signup.png
-        > Read /tmp/signup.png
-
-        Signup works. Redirected to onboarding. Now checking changed pages.
-
-        > browse goto https://staging.myapp.com/dashboard
-        > browse screenshot /tmp/dashboard.png
-        > Read /tmp/dashboard.png
-        > browse console
-
-        Dashboard loads. No console errors. Charts render with sample data.
-
-        > browse goto https://staging.myapp.com/settings/billing
-        > browse screenshot /tmp/billing.png
-        > Read /tmp/billing.png
-
-        Billing page loads. Plan selector shows Free/Pro/Enterprise.
-        Stripe elements render correctly.
-
-        > browse goto https://staging.myapp.com/api/health
-        > browse text
-
-        API health endpoint returns {"status":"ok","version":"2.4.1"}.
-
-        All 4 pages load correctly. No console errors. No broken layouts.
-        Signup → onboarding → dashboard flow works end to end.
-```
-
-18 tool calls, about a minute. It signed up a test user, navigated every page I changed, took screenshots, read them, checked the console for errors, and verified the API. That is a full QA pass. I did not open a browser.
-
-It works for reading documentation, verifying deployments, filling out forms, taking screenshots, comparing pages across environments, and anything else where Claude needs eyes on a live URL.
-
-**Security note:** `/browse` runs a persistent Chromium session. Cookies, localStorage, and session state carry over between commands. Do not use it against sensitive production environments unless you intend to — it is a real browser with real state. The session auto-shuts down after 30 minutes of idle time.
-
-For the full command reference, technical internals, and architecture details, see [BROWSER.md](BROWSER.md).
-
----
-
 ## `/probe`
 
 This is my **QA lead mode**.
 
-`/browse` gives the agent eyes. `/probe` gives it a testing methodology.
+`/probe` gives the agent a testing methodology.
 
 The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/probe` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan. It figures out what to test from the code you changed.
 
@@ -452,11 +390,59 @@ Reports and screenshots accumulate in `.forge/qa-reports/` so you can track qual
 
 ---
 
+## `/design-db`
+
+This is my **database architect mode**.
+
+Most projects run into database mistakes that are painful to fix after launch: wrong primary key type, no indexes on foreign keys, storing currency as a float, enums in comma-separated strings. `/design-db` forces the right decisions up front, interactively.
+
+It works in five phases:
+
+1. **Understand the problem** — asks about scale, consistency requirements, read/write ratio, and query patterns before touching schema
+2. **SQL vs NoSQL decision** — runs a structured framework and recommends a database type with justification. If NoSQL, picks the right sub-type (document, graph, time-series, key-value, column-family)
+3. **Schema design** — extracts entities, draws an ASCII ER diagram, then generates full DDL (SQL) or document shapes (NoSQL) with naming conventions, constraints, indexes, and embed/reference decisions
+4. **Production checklist** — validates every table against data integrity, performance, operations, security, and scale criteria
+5. **Watch-out list** — flags decisions that are fine now but will hurt at scale (e.g. INT primary key hitting the 2B ceiling)
+
+```
+You:   /design-db
+
+Claude: Describe the system you're building. What does it do,
+        who uses it, and what are the core operations?
+
+You:   A marketplace where freelancers list services and clients
+       book them. Payments go through Stripe. ~10K users at launch.
+
+Claude: A few questions before I design anything...
+        [Asks about scale, consistency needs, query patterns]
+
+        Recommendation: PostgreSQL
+        Payments + bookings need ACID transactions. Query patterns
+        are varied (search, filters, user history). Schema is known
+        upfront. Strong team SQL fluency beats a NoSQL learning curve
+        at your scale.
+
+        Entity map:
+          User (1) ────< Service (N)
+          User (1) ────< Booking (N) >──── Service (1)
+          Booking (1) ──── Payment (1)
+
+        [Generates full DDL with indexes, constraints, soft deletes]
+
+        Production checklist: 12/12 ✓
+        Watch-out: services.price stored as NUMERIC(10,2) ✓
+                   booking_id uses UUID (distributed-safe) ✓
+```
+
+Anti-patterns it catches proactively: EAV tables, comma-separated arrays, currency as FLOAT, god tables, missing timestamps, no indexes anywhere.
+
+---
+
 ## Upgrading
 
 Paste this into Claude Code:
 
-> Update forge: run `cd ~/.claude/skills/forge && git fetch origin && git reset --hard origin/main && ./setup` (repo: https://github.com/murtaza-bagwala/forge). If this project also has forge at .claude/skills/forge, update it too: run `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
+> Update forge: run `cd ~/.claude/skills/forge && git fetch origin && git reset --hard origin/main && ./setup` (repo: https://github.com/murtaza-bagwala/forge). If this project also has forge at .claude/skills/forge, update it too: run `for s in browse plan-product-review plan-eng-review audit ship probe design-db; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge && cp -Rf ~/.claude/skills/forge .claude/skills/forge && rm -rf .claude/skills/forge/.git && cd .claude/skills/forge && ./setup`
 
 The `setup` script rebuilds the browser binary and re-symlinks skills. It takes a few seconds.
 
@@ -464,7 +450,7 @@ The `setup` script rebuilds the browser binary and re-symlinks skills. It takes 
 
 Paste this into Claude Code:
 
-> Uninstall forge: remove the skill symlinks by running `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f ~/.claude/skills/$s; done` then run `rm -rf ~/.claude/skills/forge` and remove the forge section from CLAUDE.md. If this project also has forge at .claude/skills/forge, remove it by running `for s in browse plan-product-review plan-eng-review audit ship test; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge` and remove the forge section from the project CLAUDE.md too.
+> Uninstall forge: remove the skill symlinks by running `for s in browse plan-product-review plan-eng-review audit ship probe design-db; do rm -f ~/.claude/skills/$s; done` then run `rm -rf ~/.claude/skills/forge` and remove the forge section from CLAUDE.md. If this project also has forge at .claude/skills/forge, remove it by running `for s in browse plan-product-review plan-eng-review audit ship probe design-db; do rm -f .claude/skills/$s; done && rm -rf .claude/skills/forge` and remove the forge section from the project CLAUDE.md too.
 
 ## Development
 
