@@ -64,6 +64,13 @@ Review a technical design doc: architecture, tradeoffs, risks, missing considera
 # → paste your design doc and get structured feedback
 ```
 
+### `/design-db` — Database Design Workshop
+Design a production database from a problem statement: SQL vs NoSQL brainstorm, entity-relationship diagrams, full schema with indexes, and a production checklist.
+```bash
+/design-db
+# → describe your system, get a complete DB design
+```
+
 ---
 
 ## Quick Start

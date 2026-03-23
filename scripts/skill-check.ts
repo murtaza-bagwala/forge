@@ -24,6 +24,7 @@ const SKILL_FILES = [
   'audit/SKILL.md',
   'plan-product-audit/SKILL.md',
   'plan-eng-audit/SKILL.md',
+  'design-db/SKILL.md',
 ].filter(f => fs.existsSync(path.join(ROOT, f)));
 
 let hasErrors = false;

@@ -180,6 +180,7 @@ function findTemplates(): string[] {
     path.join(ROOT, 'plan-product-review', 'SKILL.md.tmpl'),
     path.join(ROOT, 'plan-eng-review', 'SKILL.md.tmpl'),
     path.join(ROOT, 'retro', 'SKILL.md.tmpl'),
+    path.join(ROOT, 'design-db', 'SKILL.md.tmpl'),
   ];
   for (const p of candidates) {
     if (fs.existsSync(p)) templates.push(p);

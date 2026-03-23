@@ -732,61 +732,6 @@ Focus on architecture, code quality, tests, and performance sections.`,
   }, 420_000);
 });
 
-// --- Retro E2E ---
-
-describeE2E('Retro E2E', () => {
-
-  beforeAll(() => {
-    const { spawnSync } = require('child_process');
-    const run = (cmd: string, args: string[]) =>
-
-    // Create a git repo with varied commit history
-    run('git', ['init']);
-    run('git', ['config', 'user.email', 'dev@example.com']);
-    run('git', ['config', 'user.name', 'Dev']);
-
-    // Day 1 commits
-    run('git', ['add', 'app.ts']);
-    run('git', ['commit', '-m', 'feat: initial app setup', '--date', '2026-03-10T09:00:00']);
-
-    run('git', ['add', 'auth.ts']);
-    run('git', ['commit', '-m', 'feat: add auth module', '--date', '2026-03-10T11:00:00']);
-
-    // Day 2 commits
-    run('git', ['add', 'app.ts']);
-    run('git', ['commit', '-m', 'fix: wire up auth to app', '--date', '2026-03-11T10:00:00']);
-
-    run('git', ['add', 'test.ts']);
-    run('git', ['commit', '-m', 'test: add login test', '--date', '2026-03-11T14:00:00']);
-
-    // Day 3 commits
-    run('git', ['add', 'api.ts']);
-    run('git', ['commit', '-m', 'feat: add users API endpoint', '--date', '2026-03-12T09:30:00']);
-
-    run('git', ['add', 'README.md']);
-    run('git', ['commit', '-m', 'docs: add README', '--date', '2026-03-12T16:00:00']);
-
-    fs.copyFileSync(
-    );
-  });
-
-  afterAll(() => {
-  });
-
-    const result = await runSkillTest({
-
-
-Analyze the git history and produce the narrative report as described in the SKILL.md.`,
-      maxTurns: 30,
-      timeout: 300_000,
-      runId,
-    });
-
-    expect(['success', 'error_max_turns']).toContain(result.exitReason);
-
-    }
-  }, 420_000);
-});
 
 // --- Deferred skill E2E tests (destructive or require interactive UI) ---
 

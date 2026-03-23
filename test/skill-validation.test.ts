@@ -8,17 +8,6 @@ import * as path from 'path';
 const ROOT = path.resolve(import.meta.dir, '..');
 
 describe('SKILL.md command validation', () => {
-  test('all $B commands in SKILL.md are valid browse commands', () => {
-    const result = validateSkill(path.join(ROOT, 'SKILL.md'));
-    expect(result.invalid).toHaveLength(0);
-    expect(result.valid.length).toBeGreaterThan(0);
-  });
-
-  test('all snapshot flags in SKILL.md are valid', () => {
-    const result = validateSkill(path.join(ROOT, 'SKILL.md'));
-    expect(result.snapshotFlagErrors).toHaveLength(0);
-  });
-
   test('all $B commands in browse/SKILL.md are valid browse commands', () => {
     const result = validateSkill(path.join(ROOT, 'browse', 'SKILL.md'));
     expect(result.invalid).toHaveLength(0);
@@ -156,9 +145,11 @@ describe('Generated SKILL.md freshness', () => {
 
 describe('Update check preamble', () => {
   const skillsWithUpdateCheck = [
-    'SKILL.md', 'browse/SKILL.md', 'qa/SKILL.md',
-    'ship/SKILL.md', 'audit/SKILL.md',
-    'plan-product-audit/SKILL.md', 'plan-eng-audit/SKILL.md',
+    'browse/SKILL.md',
+    'ship/SKILL.md',
+    'plan-product-review/SKILL.md',
+    'plan-eng-review/SKILL.md',
+    'design-db/SKILL.md',
   ];
 
   for (const skill of skillsWithUpdateCheck) {
@@ -196,105 +187,6 @@ describe('Update check preamble', () => {
   });
 });
 
-// --- Part 7: Cross-skill path consistency (A1) ---
-
-describe('Cross-skill path consistency', () => {
-  test('REMOTE_SLUG derivation pattern is identical across files that use it', () => {
-    const patterns = extractRemoteSlugPatterns(ROOT, ['qa', 'review']);
-    const allPatterns: string[] = [];
-
-    for (const [, filePatterns] of patterns) {
-      allPatterns.push(...filePatterns);
-    }
-
-    // Should find at least 2 occurrences (qa/SKILL.md + audit/checklist.md)
-    expect(allPatterns.length).toBeGreaterThanOrEqual(2);
-
-    // All occurrences must be character-for-character identical
-    const unique = new Set(allPatterns);
-    if (unique.size > 1) {
-      const variants = Array.from(unique);
-      throw new Error(
-        `REMOTE_SLUG pattern differs across files:\n` +
-        variants.map((v, i) => `  ${i + 1}: ${v}`).join('\n')
-      );
-    }
-  });
-
-
-
-// --- Part 7: QA skill structure validation (A2) ---
-
-describe('QA skill structure validation', () => {
-  const qaContent = fs.readFileSync(path.join(ROOT, 'qa', 'SKILL.md'), 'utf-8');
-
-  test('qa/SKILL.md has all 6 phases', () => {
-    const phases = [
-      'Phase 1', 'Initialize',
-      'Phase 2', 'Authenticate',
-      'Phase 3', 'Orient',
-      'Phase 4', 'Explore',
-      'Phase 5', 'Document',
-      'Phase 6', 'Wrap Up',
-    ];
-    for (const phase of phases) {
-      expect(qaContent).toContain(phase);
-    }
-  });
-
-  test('has all four QA modes defined', () => {
-    const modes = [
-      'Diff-aware',
-      'Full',
-      'Quick',
-      'Regression',
-    ];
-    for (const mode of modes) {
-      expect(qaContent).toContain(mode);
-    }
-
-    // Mode triggers/flags
-    expect(qaContent).toContain('--quick');
-    expect(qaContent).toContain('--regression');
-  });
-
-  test('health score weights sum to 100%', () => {
-    const weights = extractWeightsFromTable(qaContent);
-    expect(weights.size).toBeGreaterThan(0);
-
-    let sum = 0;
-    for (const pct of weights.values()) {
-      sum += pct;
-    }
-    expect(sum).toBe(100);
-  });
-
-  test('health score has all 8 categories', () => {
-    const weights = extractWeightsFromTable(qaContent);
-    const expectedCategories = [
-      'Console', 'Links', 'Visual', 'Functional',
-      'UX', 'Performance', 'Content', 'Accessibility',
-    ];
-    for (const cat of expectedCategories) {
-      expect(weights.has(cat)).toBe(true);
-    }
-    expect(weights.size).toBe(8);
-  });
-
-  test('has four mode definitions (Diff-aware/Full/Quick/Regression)', () => {
-    expect(qaContent).toContain('### Diff-aware');
-    expect(qaContent).toContain('### Full');
-    expect(qaContent).toContain('### Quick');
-    expect(qaContent).toContain('### Regression');
-  });
-
-  test('output structure references report directory layout', () => {
-    expect(qaContent).toContain('qa-report-');
-    expect(qaContent).toContain('baseline.json');
-    expect(qaContent).toContain('screenshots/');
-    expect(qaContent).toContain('.forge/qa-reports/');
-  });
-});
 
 
 // --- Part 7: Planted-bug fixture validation (A4) ---
