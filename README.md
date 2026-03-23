@@ -2,27 +2,17 @@
 
 **Forge turns Claude Code from one generic assistant into a team of specialists you can summon on demand.**
 
-Eight opinionated workflow skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Plan review, code review, database design, one-command shipping, browser automation, and QA testing — all as slash commands.
+Eight workflow skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — all as slash commands.
 
-### Without forge
-
-- The agent takes your request literally — it never asks if you're building the right thing
-- It will implement exactly what you said, even when the real product is something bigger
-- "Review my PR" gives inconsistent depth every time
-- "Ship this" turns into a long back-and-forth about what to do
-- You still do QA by hand: open browser, click around, check pages, squint at layouts
-
-### With forge
-
-| Skill | Mode | What it does |
-|-------|------|--------------|
-| `/forge` | Help & index | List all available skills with descriptions and quick-start examples. Start here. |
-| `/plan-product-review` | Founder / CEO | Rethink the problem. Find the 10-star product hiding inside the request. |
-| `/plan-eng-review` | Eng manager / tech lead | Lock in architecture, data flow, diagrams, edge cases, and tests. |
-| `/audit` | Paranoid staff engineer | Find the bugs that pass CI but blow up in production. |
-| `/ship` | Release engineer | Sync main, run tests, push, open PR. For a ready branch, not for deciding what to build. |
-| `/probe` | QA lead | Systematic QA testing. On a feature branch, auto-analyzes your diff, identifies affected pages, and tests them. Also: full exploration, quick smoke test, regression mode. |
-| `/design-db` | Database architect | Interactive database design workshop. SQL vs NoSQL decision framework, ER diagrams, full schema with indexes and constraints, production checklist, anti-pattern callouts. |
+| Skill | What it does |
+|-------|--------------|
+| `/forge` | Show all available skills with descriptions and quick-start examples. |
+| `/plan-product-review` | Challenge the problem before writing a line of code. Is this the right feature? For whom? |
+| `/plan-eng-review` | Lock in architecture, data flow, edge cases, diagrams, and test coverage. |
+| `/audit` | Find bugs that survive CI — race conditions, N+1s, trust boundary issues, missing indexes. |
+| `/ship` | Sync main, run tests, bump version, commit, push, open PR. |
+| `/probe` | QA your feature branch: reads the diff, finds affected pages, tests them automatically. |
+| `/design-db` | Design a production database — SQL vs NoSQL decision, ER diagram, full schema, indexes, checklist. |
 
 ## Demo: one feature, six modes
 
